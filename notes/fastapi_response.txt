@@ -1,0 +1,79 @@
+当 `raise HTTPException(404, 'User not found!')` 被触发时，FastAPI 会自动生成一个 `Response` 实例并返回给客户端。这个 `Response` 实例包含了以下部分：
+
+### 1. **状态码 (status code)**
+
+- 由于我们传递了 `404` 状态码，生成的 `Response` 实例的 `status_code` 会是 `404`，表示 "Not Found"。
+
+### 2. **响应体 (body)**
+
+- 响应体会包含 `HTTPException` 中传入的 `detail` 字段内容。在这个例子中，`detail` 字段是字符串 `'User not found!'`，所以响应体会是：
+  ```json
+  {
+      "detail": "User not found!"
+  }
+  ```
+- FastAPI 将 `detail` 自动转换为 JSON 格式。
+
+### 3. **响应头 (headers)**
+
+- 除了默认的 HTTP 响应头之外，`Content-Type` 会被设置为 `application/json`，因为响应体是 JSON 数据。其他默认的头信息可能包含日期、服务器等信息：
+  ```http
+  Content-Type: application/json
+  ```
+
+### 4. **响应原因短语 (reason phrase)**
+
+- 通常来说，FastAPI 会根据状态码添加一个原因短语。对于 `404` 状态码，原因短语是 "Not Found"。
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+在正常情况下（即没有出错时），`FastAPI` 会自动为 `response` 设置一个默认的 `200 OK` 状态码和响应内容。具体地讲，返回的 `response` 包含以下几个部分：
+
+### 1. **状态码 (status code)**
+
+- 默认情况下，状态码为 `200`，表示请求成功。
+- 如果你返回自定义的状态码，可以通过 `status_code` 参数指定，例如：
+  ```python
+  @app.post('/example', status_code=201)
+  def create_item(item: Item):
+      return item
+  ```
+  在这里，响应状态码将是 `201 Created`，而不是默认的 `200 OK`。
+
+### 2. **响应体 (body)**
+
+- 响应体会是由视图函数返回的内容。可以是任何 JSON 可序列化的数据（字典、列表等），或自定义的模型实例。
+- 例如：
+  ```python
+  @app.get('/user/{user_id}')
+  def get_user(user_id: int):
+      return {"user_id": user_id, "name": "Alice"}
+  ```
+  这段代码会返回以下 JSON 响应体：
+  ```json
+  {
+      "user_id": 1,
+      "name": "Alice"
+  }
+  ```
+
+### 3. **响应头 (headers)**
+
+- 默认情况下，`FastAPI` 会设置 `Content-Type: application/json`，因为响应体是 JSON 格式的数据。
+- 你可以通过 `Response` 类手动添加自定义的响应头，例如：
+  ```python
+  from fastapi import Response
+
+  @app.get('/custom-header')
+  def custom_header(response: Response):
+      response.headers["X-Custom-Header"] = "Custom Value"
+      return {"message": "Hello"}
+  ```
+  这里的响应会包含自定义的头信息：
+  ```http
+  X-Custom-Header: Custom Value
+  ```
+
+### 4. **响应原因短语 (reason phrase)**
+
+- 默认原因短语为 "OK"（对应状态码 `200`）。

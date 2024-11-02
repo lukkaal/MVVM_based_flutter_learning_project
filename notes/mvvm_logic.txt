@@ -1,0 +1,11 @@
+ 三者之间的关系
+工作流程：
+用户请求：使用 Thunder Client，开发者构建一个用户注册请求，输入必要的信息（如邮箱、姓名和密码）。
+
+API 接收请求：请求发送到 FastAPI 的 /signup 路由。FastAPI 接收到请求后，使用定义的 UserCreate Pydantic 模型对输入数据进行验证。
+
+数据库交互：
+
+FastAPI 查询 PostgreSQL 数据库，检查用户是否已存在（根据邮箱）。
+如果用户不存在，FastAPI 使用 bcrypt 对密码进行哈希处理，然后将用户信息存入 PostgreSQL 数据库。
+返回响应：FastAPI 处理完请求后，将响应（成功或失败消息）发送回 Thunder Client，用户可以在 Thunder Client 中查看结果。
